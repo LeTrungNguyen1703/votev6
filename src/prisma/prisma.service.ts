@@ -7,17 +7,24 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const datasourceUrl = DB?.connectionString;
+    // Prefer the connection string from the Encore `DB` object, then fall back to the
+    // environment variable. Only include the `datasources` override when we actually
+    // have a URL; otherwise let Prisma read from process.env as usual.
+    const datasourceUrl = DB?.connectionString ?? process.env.DATABASE_URL;
 
-    super({
-      datasources: {
+    const prismaOptions: any = {
+      log: ['query', 'info', 'warn', 'error'],
+    };
+
+    if (datasourceUrl) {
+      prismaOptions.datasources = {
         db: {
           url: datasourceUrl,
         },
+      };
+    }
 
-      },
-      log: ['query', 'info', 'warn', 'error'],
-    });
+    super(prismaOptions);
   }
 
   async onModuleInit() {
