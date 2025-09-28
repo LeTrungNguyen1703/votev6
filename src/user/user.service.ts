@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/binary';
 
 @Injectable()
 export class UserService {
@@ -40,34 +39,34 @@ export class UserService {
 
     return user;
   }
-
-  async update(id: number, updateUserDto: Partial<CreateUserDto>) {
-    try {
-      // If a new password is provided, hash it before updating
-      if (updateUserDto.passwordHash) {
-        updateUserDto.passwordHash = await bcrypt.hash(updateUserDto.passwordHash, 10);
-      }
-
-      return this.prisma.user.update({
-        where: { id },
-        data: updateUserDto,
-      });
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new Error(`User with ID ${id} does not exist.`);
-      }
-    }
-  }
-
-  remove(id: number) {
-    try {
-      return this.prisma.user.delete({
-        where: { id },
-      });
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
-        throw new Error(`User with ID ${id} does not exist.`);
-      }
-    }
-  }
+  //
+  // async update(id: number, updateUserDto: Partial<CreateUserDto>) {
+  //   try {
+  //     // If a new password is provided, hash it before updating
+  //     if (updateUserDto.passwordHash) {
+  //       updateUserDto.passwordHash = await bcrypt.hash(updateUserDto.passwordHash, 10);
+  //     }
+  //
+  //     return this.prisma.user.update({
+  //       where: { id },
+  //       data: updateUserDto,
+  //     });
+  //   } catch (error) {
+  //     if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+  //       throw new Error(`User with ID ${id} does not exist.`);
+  //     }
+  //   }
+  // }
+  //
+  // remove(id: number) {
+  //   try {
+  //     return this.prisma.user.delete({
+  //       where: { id },
+  //     });
+  //   } catch (error) {
+  //     if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+  //       throw new Error(`User with ID ${id} does not exist.`);
+  //     }
+  //   }
+  // }
 }
